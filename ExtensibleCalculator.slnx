@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ExtensibleAPI/ExtensibleAPI.csproj" />
+  <Project Path="ExtensibleCalculator/ExtensibleCalculator.csproj" />
+  <Project Path="InversePythagorean/InversePythagorean.csproj" />
+</Solution>
