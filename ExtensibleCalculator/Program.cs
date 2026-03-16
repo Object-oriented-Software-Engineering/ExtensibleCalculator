@@ -5,43 +5,94 @@ using System.Linq;
 using System.Reflection;
 using ExtensibleAPI;
 
+internal class Program
+{
+    public static void Main(string[] args)
+    {
+        // Test Addition operation
+        Addition addition = new Addition();
+        addition.Arguments[0] = 5;
+        addition.Arguments[1] = 10;
+        Console.WriteLine(addition.PrintResult());
+        while (true) {
+            if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Escape) {
+                break;
+            }
+            // 2. Aquire the calculator operation set
+            List<IOperation> operations = GetAvailableOperations();
+            int operationindex = 0;
+            foreach (IOperation operation in operations) {
+                Console.WriteLine($"{operationindex}. {operation.Name}");
+                operationindex++;
+            }
 
-// Main program flow:
-// Test Addition operation
-Addition addition = new Addition();
-addition.Arguments[0] = 5;
-addition.Arguments[1] = 10;
-Console.WriteLine(addition.PrintResult());
+            Console.Write("Select the operation by entering the corresponding number (or press ESC to exit):");
+            string selected = Console.ReadLine();
+            int selectedIndex;
+            if (Int32.TryParse(selected, out selectedIndex)) {
+                // Request arguments for the selected operation
+                IOperation selectedOperation = operations[selectedIndex];
+                int i = 0;
+                foreach (string argument in selectedOperation.ArgumentNames) {
+                    Console.Write($"Give {argument}:");
+                    string argumentString = Console.ReadLine();
+                    double argumentValue;
+                    while (!Double.TryParse(argumentString, out argumentValue)) {
+                        Console.Write($"Invalid input. Please enter a double number for {argument}:");
+                        argumentString = Console.ReadLine();
+                    }
 
+                    selectedOperation.Arguments[i] = argumentValue;
+                    i++;
+                }
 
+                Console.WriteLine(selectedOperation.PrintResult());
+            }
 
+        }
 
-//2. Aquire the calculator operation set
+    }
 
+    private static List<IOperation> GetAvailableOperations()
+    {
+        List<IOperation> operations = new List<IOperation>
+        {
+            new Addition(),
+            new Subtraction(),
+            new Multiplication(),
+            new Division()
+        };
+        
+        return operations;
+    }
+}
 
-//3. Present the user with a menu of operations and prompt them to
-//select one recursively until they select a valid one
-
-
-
-
-
-//1. Create build-in calculator operations (add, subtract, multiply, divide) 
-public class Addition : IOperation {
+// 1. Create build-in calculator operations (add, subtract, multiply, divide)
+public class Addition : IOperation
+{
     public string Name { get; init; } = "Addition";
+
     private string[] _argumentNames = new string[2];
-    private double[] _arguments = new double[2];
-    public string[] ArgumentNames {
+    private readonly double[] _arguments = new double[2];
+
+    public string[] ArgumentNames
+    {
         get => _argumentNames;
-        init {
-            if (value.Length != 2) {
+        init
+        {
+            if (value.Length != 2)
+            {
                 throw new ArgumentException("Addition operation requires exactly 2 arguments.");
             }
+
             _argumentNames = value;
         }
     }
+
     public double[] Arguments => _arguments;
-    public double Calculate(params List<double> arguments) {
+
+    public double Calculate(params List<double> arguments)
+    {
         return arguments[0] + arguments[1];
     }
 
@@ -52,7 +103,6 @@ public class Addition : IOperation {
     public Addition() {
         ArgumentNames = new string[] { "Term1", "Term2" };
     }
-
 }
 
 public class Subtraction : IOperation {
