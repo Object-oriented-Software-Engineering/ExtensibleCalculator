@@ -62,7 +62,29 @@ internal class Program
             new Multiplication(),
             new Division()
         };
-        
+
+        // Check the Extensions Project folder for additional operations
+        string baseDir = AppContext.BaseDirectory;
+        string dataDir = Path.Combine(baseDir,"Extensions");
+        if (Directory.Exists(dataDir)) {
+            string[] dllFiles = Directory.GetFiles(dataDir, "Extension*.dll");
+            foreach (string dllFile in dllFiles) {
+                try {
+                    Assembly assembly = Assembly.LoadFrom(dllFile);
+                    Type[] types = assembly.GetTypes();
+                    foreach (Type type in types) {
+                        if (typeof(IOperation).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract) {
+                            IOperation operationInstance = (IOperation)Activator.CreateInstance(type);
+                            operations.Add(operationInstance);
+                        }
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"Failed to load operations from {dllFile}: {ex.Message}");
+                }
+            }
+        }
+
+
         return operations;
     }
 }

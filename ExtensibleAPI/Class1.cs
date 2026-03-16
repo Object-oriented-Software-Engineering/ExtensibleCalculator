@@ -6,7 +6,7 @@
         double[] Arguments { get; }
 
         double Calculate(params List<double> arguments);
-
+        
         string PrintResult();
     }
 }
